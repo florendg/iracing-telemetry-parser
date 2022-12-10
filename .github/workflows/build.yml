@@ -5,12 +5,12 @@ jobs:
   build-app:
     strategy:
       matrix:
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        os: [ macos-latest, ubuntu-20.04, windows-latest ]
     name: Build the application
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
       - name: Setup Java
         uses: actions/setup-java@v3
         with:

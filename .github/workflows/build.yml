@@ -1,0 +1,24 @@
+name: build installer for support OS
+on: push
+
+jobs:
+  build-app:
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+    name: Build the application
+    run-as: {{ matrix.os }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 19
+      - run: ./gradlew package
+      - run: mkdir staging && cp app/build/installer/* staging
+      - name: upload build result
+        uses: actions/upload-artifact@v2
+        with:
+          name: iracing-parser-${{matrix.os}}
+          path: staging

@@ -7,7 +7,7 @@ jobs:
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
     name: Build the application
-    run-as: ${{ matrix.os }}
+    run-on: ${{ matrix.os }}
     steps:
       - name: checkout
         uses: actions/checkout@v2

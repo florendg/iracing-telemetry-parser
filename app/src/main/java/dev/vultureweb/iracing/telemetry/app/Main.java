@@ -31,11 +31,32 @@ public class Main {
             BufferInfo bufferInfo = metaInfo.bufferInfo();
             while (stream.available() >= bufferInfo.length()) {
                 ByteBuffer rawBuffer = ByteBuffer.wrap(stream.readNBytes(bufferInfo.length())).order(ByteOrder.LITTLE_ENDIAN);
-                System.out.println(rawBuffer.getDouble() + "\t" + rawBuffer.getFloat(762));
+                printBuffer(rawBuffer,varHeaders);
             }
 
         } catch (IOException exception) {
             System.err.println("Error reading telemetry " + exception);
         }
+    }
+
+    static void printBuffer(ByteBuffer sample, List<VarHeader> varHeaders) {
+        for(VarHeader header : varHeaders) {
+            switch(header.info().type()) {
+                case 5:
+                    System.out.print(sample.getDouble(header.info().offset()));
+                    break;
+                case 2:
+                    System.out.print(sample.getInt(header.info().offset()));
+                    break;
+                case 1:
+                    System.out.print(sample.get(header.info().offset()));
+                    break;
+                case 4:
+                    System.out.print(sample.getFloat(header.info().offset()));
+                    break;
+            }
+            System.out.print(";");
+        }
+        System.out.println();
     }
 }

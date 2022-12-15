@@ -1,4 +1,4 @@
-package dev.vultureweb.iracing.telemetry.app.model;
+package dev.vultureweb.iracing.telemetry.api;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

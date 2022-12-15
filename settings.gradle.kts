@@ -8,4 +8,4 @@
  */
 
 rootProject.name = "iracing-telemetry-parser"
-include("app")
+include("telemetry-api", "telemetry-store", "app")

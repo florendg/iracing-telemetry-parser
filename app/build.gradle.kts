@@ -7,6 +7,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":telemetry-api"))
+    //project(":telemetry-store")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 }
 

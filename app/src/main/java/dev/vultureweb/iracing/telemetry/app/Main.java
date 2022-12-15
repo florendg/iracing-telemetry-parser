@@ -1,5 +1,6 @@
 package dev.vultureweb.iracing.telemetry.app;
 
+import dev.vultureweb.iracing.telemetry.api.VarHeader;
 import dev.vultureweb.iracing.telemetry.app.model.*;
 
 import java.io.*;

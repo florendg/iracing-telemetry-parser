@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class Main {
     public static void main(String[] args) {
@@ -42,22 +43,16 @@ public class Main {
 
     static void printBuffer(ByteBuffer sample, List<VarHeader> varHeaders) {
         for(VarHeader header : varHeaders) {
-            switch(header.info().type()) {
-                case 5:
-                    System.out.print(sample.getDouble(header.info().offset()));
-                    break;
-                case 2:
-                    System.out.print(sample.getInt(header.info().offset()));
-                    break;
-                case 1:
-                    System.out.print(sample.get(header.info().offset()));
-                    break;
-                case 4:
-                    System.out.print(sample.getFloat(header.info().offset()));
-                    break;
+            switch (header.info().type()) {
+                case 5 -> System.out.print(sample.getDouble(header.info().offset()));
+                case 2, 3 -> System.out.print(sample.getInt(header.info().offset()));
+                case 1 -> System.out.print(sample.get(header.info().offset()));
+                case 4 -> System.out.print(sample.getFloat(header.info().offset()));
             }
             System.out.print(";");
         }
+
         System.out.println();
     }
+
 }

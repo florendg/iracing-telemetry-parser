@@ -1,5 +1,6 @@
 package dev.vultureweb.iracing.telemetry.app.model.type;
 
+import dev.vultureweb.iracing.telemetry.api.model.type.IrDouble;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

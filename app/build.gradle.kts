@@ -8,7 +8,6 @@ repositories {
 
 dependencies {
     implementation(project(":telemetry-api"))
-    //project(":telemetry-store")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 }
 
@@ -17,14 +16,14 @@ val appModuleName = "dev.vultureweb.iracing.telemetry.app"
 val appName = "iracing-parser"
 
 val compiler = javaToolchains.compilerFor {
-    languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_19.majorVersion))
+    languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_20.majorVersion))
 }
 
 java {
     modularity.inferModulePath.set(true);
     toolchain {
         vendor.set(JvmVendorSpec.ADOPTIUM)
-        languageVersion.set(JavaLanguageVersion.of(19))
+        languageVersion.set(JavaLanguageVersion.of(20))
     }
 }
 

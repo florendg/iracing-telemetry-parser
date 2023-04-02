@@ -1,6 +1,5 @@
 package dev.vultureweb.iracing.sessioninfo.reader;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,7 +14,9 @@ class SessionInfoReaderTest {
     void testReadSessionInfo() {
         var sessionInfoReader = new SessionInfoReader();
         var sessionInfo = sessionInfoReader.readSessionInfo("SessionNum: 1");
-        assertEquals(new ObjectNode(JsonNodeFactory.instance), sessionInfo);
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.set("SessionNum", new IntNode(1));
+        assertEquals(node, sessionInfo);
     }
 
 }

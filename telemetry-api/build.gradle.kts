@@ -7,6 +7,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":session-info-reader"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 }
 

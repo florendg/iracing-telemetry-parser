@@ -1,5 +1,6 @@
 package dev.vultureweb.iracing.telemetry.api;
 
+import dev.vultureweb.iracing.sessioninfo.reader.SessionInfoReader;
 import dev.vultureweb.iracing.telemetry.api.model.*;
 
 import java.io.IOException;
@@ -34,7 +35,8 @@ public class TelemetryApi {
          SessionInfo sessionInfo = metaInfo.sessionInfo();
          byte[] si = dataStream.readNBytes(sessionInfo.length());
 
-         String sessionJson = new String(si, StandardCharsets.US_ASCII);
+         String sessionYaml = new String(si, StandardCharsets.US_ASCII);
+         var sessionInfoJson = SessionInfoReader.readSessionInfo(sessionYaml);
          BufferInfo bufferInfo = metaInfo.bufferInfo();
 
          ByteBuffer data = ByteBuffer.wrap(dataStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);

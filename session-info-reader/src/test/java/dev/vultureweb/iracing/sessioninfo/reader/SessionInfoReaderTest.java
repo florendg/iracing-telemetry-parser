@@ -12,8 +12,7 @@ class SessionInfoReaderTest {
 
     @Test
     void testReadSessionInfo() {
-        var sessionInfoReader = new SessionInfoReader();
-        var sessionInfo = sessionInfoReader.readSessionInfo("SessionNum: 1");
+        var sessionInfo = SessionInfoReader.readSessionInfo("SessionNum: 1");
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.set("SessionNum", new IntNode(1));
         assertEquals(node, sessionInfo);

@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0-rc2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 }
 

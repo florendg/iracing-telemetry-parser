@@ -8,16 +8,16 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TelemetryApi {
 
    private static final System.Logger LOG = System.getLogger(TelemetryApi.class.getName());
 
-   public Telemetry loadRTelemetry(final InputStream dataStream) {
+   private final Map<UUID,Telemetry> telemetryCache = new HashMap<>();
+
+   public UUID loadRTelemetry(final InputStream dataStream) {
 
       try (dataStream) {
          assert (dataStream != null);
@@ -40,8 +40,9 @@ public class TelemetryApi {
          BufferInfo bufferInfo = metaInfo.bufferInfo();
 
          ByteBuffer data = ByteBuffer.wrap(dataStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
-         return new Telemetry(sessionInfo, varHeaders, bufferInfo, data);
-
+         UUID uuid = UUID.randomUUID();
+         telemetryCache.put(uuid,new Telemetry(sessionInfoJson, varHeaders, bufferInfo, data));
+         return uuid;
       } catch (IOException exception) {
          LOG.log(System.Logger.Level.ERROR, "Error reading telemetry data", exception);
          throw new RuntimeException(exception);
@@ -49,8 +50,9 @@ public class TelemetryApi {
 
    }
 
-   public List<String> getVarNames(Telemetry telemetry) {
-      return telemetry.varHeaders().keySet().stream().collect(Collectors.toList());
+   public List<String> getVarNames(UUID telemetryUUID) {
+      Telemetry telemetry = telemetryCache.get(telemetryUUID);
+      return new ArrayList<>(telemetry.varHeaders().keySet());
    }
 
    public String getSessionInfo() {

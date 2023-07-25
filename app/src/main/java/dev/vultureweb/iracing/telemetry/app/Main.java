@@ -10,6 +10,7 @@ public class Main {
    private static final System.Logger LOGGER = System.getLogger(Main.class.getName());
    public static void main(String[] args) {
       try(InputStream stream = Main.class.getResourceAsStream("dallaraf3.ibt")) {
+         if(stream == null) throw new Exception("Could not find file");
          var telemetry = new TelemetryApi();
          UUID telemetryUid = telemetry.loadRTelemetry(stream);
          System.out.println(telemetry.getVarNames(telemetryUid));

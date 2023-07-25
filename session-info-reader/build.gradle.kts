@@ -12,7 +12,7 @@ dependencies {
 }
 
 java {
-    modularity.inferModulePath.set(true);
+    modularity.inferModulePath.set(true)
     toolchain {
         vendor.set(JvmVendorSpec.ADOPTIUM)
         languageVersion.set(JavaLanguageVersion.of(20))

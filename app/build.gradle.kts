@@ -21,7 +21,7 @@ val compiler = javaToolchains.compilerFor {
 }
 
 java {
-    modularity.inferModulePath.set(true);
+    modularity.inferModulePath.set(true)
     toolchain {
         vendor.set(JvmVendorSpec.ADOPTIUM)
         languageVersion.set(JavaLanguageVersion.of(usedJDK))
@@ -48,7 +48,7 @@ tasks {
         val jdkHome = compiler.get().metadata.installationPath.asFile.absolutePath
         commandLine("${jdkHome}/bin/jpackage")
         args(listOf(
-            "-n", "${appName}",
+            "-n", appName,
             "-p", "$buildDir/modules"+File.pathSeparator+"$buildDir/libs",
             "-d", "$buildDir/installer",
             "-m", "${appModuleName}/${appMainClassName}"))

@@ -14,16 +14,17 @@ dependencies {
 val appMainClassName = "dev.vultureweb.iracing.telemetry.app.Main"
 val appModuleName = "dev.vultureweb.iracing.telemetry.app"
 val appName = "iracing-parser"
+val usedJDK = JavaVersion.VERSION_20.majorVersion
 
 val compiler = javaToolchains.compilerFor {
-    languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_19.majorVersion))
+    languageVersion.set(JavaLanguageVersion.of(usedJDK))
 }
 
 java {
     modularity.inferModulePath.set(true);
     toolchain {
         vendor.set(JvmVendorSpec.ADOPTIUM)
-        languageVersion.set(JavaLanguageVersion.of(19))
+        languageVersion.set(JavaLanguageVersion.of(usedJDK))
     }
 }
 

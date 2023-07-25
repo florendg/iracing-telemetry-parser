@@ -13,7 +13,4 @@ public class Main {
       UUID telemetryUid = telemetry.loadRTelemetry(stream);
       System.out.println(telemetry.getVarNames(telemetryUid));
    }
-
-
-
 }

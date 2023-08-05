@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: temurin
-          java-version: 19
+          java-version: 20
       - run: ./gradlew package
       - run: mkdir staging && cp app/build/installer/* staging
       - name: upload build result

@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TelemetryApi {
 
@@ -47,7 +46,6 @@ public class TelemetryApi {
          LOG.log(System.Logger.Level.ERROR, "Error reading telemetry data", exception);
          throw new RuntimeException(exception);
       }
-
    }
 
    public List<String> getVarNames(UUID telemetryUUID) {

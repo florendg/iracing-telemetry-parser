@@ -5,10 +5,11 @@ import dev.vultureweb.iracing.telemetry.api.model.*;
 
 import java.io.IOException;
 import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 public class TelemetryApi {
@@ -25,13 +26,9 @@ public class TelemetryApi {
             VarHeaderInfo varHeaderInfo = metaInfo.varHeaderInfo();
             // Read var headers you need the slice that represents the var headers
             // it starts after the meta info block and ends at the offset of the var headers
-            //var  varHeaderSlice = mappedFile.asSlice(MetaInfo.META_INFO_BLOCK_SIZE, varHeaderLayoutSize * numberOfVars);
-//            Map<String,VarHeader> varHeaders = new HashMap<>();
-//            for (int i = 0; i < varHeaderInfo.numberOfVars(); i++) {
-//                VarHeader varHeader = VarHeader.fromByteBuffer(ByteBuffer.wrap(dataStream.readNBytes(VarHeader.VAR_HEADER_BLOCK_SIZE))
-//                        .order(ByteOrder.LITTLE_ENDIAN));
-//                varHeaders.put(varHeader.name(),varHeader);
-//            }
+            var size = varHeaderInfo.numberOfVars() * VarHeader.getMemoryLayout().byteSize();
+            List<VarHeader> varHeaders = parseVarHeaders(mappedFile.asSlice(varHeaderInfo.offset(), size), varHeaderInfo);
+//
 
             //Read session info starts after the var headers and ends at the offset of the buffer info
             //offset is meta info block size + var header layout size * number of vars
@@ -45,12 +42,23 @@ public class TelemetryApi {
 //
 //            ByteBuffer data = ByteBuffer.wrap(dataStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
             UUID uuid = UUID.randomUUID();
+            LOG.log(System.Logger.Level.INFO, "Loaded telemetry data with UUID: {0}", metaInfo);
             //telemetryCache.put(uuid,new Telemetry(sessionInfoJson, varHeaders, bufferInfo, data));
             return uuid;
         } catch (IOException exception) {
             LOG.log(System.Logger.Level.ERROR, "Error reading telemetry data", exception);
             return null;
         }
+    }
+
+    private List<VarHeader> parseVarHeaders(MemorySegment segment, VarHeaderInfo varHeaderInfo) {
+        List<VarHeader> varHeaders = new ArrayList<>();
+        for (int i = 0; i < varHeaderInfo.numberOfVars(); i++) {
+            var varHeader = VarHeader.fromMemorySegment(segment.asSlice(i * VarHeader.getMemoryLayout().byteSize(), VarHeader.getMemoryLayout().byteSize()));
+            varHeaders.add(varHeader);
+            LOG.log(System.Logger.Level.INFO, "Loaded var header {0}: {1}",i, varHeader);
+        }
+        return varHeaders;
     }
 
     public String getSessionInfo() {

@@ -1,23 +1,34 @@
 package dev.vultureweb.iracing.telemetry.api.model;
 
+import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SequenceLayout;
+import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 public record VarHeader(String name, String description, String unit, VarInfo info) {
 
-   public static final int VAR_HEADER_BLOCK_SIZE = 144;
+    private static MemoryLayout MEMORY_LAYOUT = MemoryLayout.structLayout(
+            VarInfo.getMemoryLayout(),
+            MemoryLayout.sequenceLayout(32, ValueLayout.JAVA_BYTE).withName("name"),
+            MemoryLayout.sequenceLayout(64, ValueLayout.JAVA_BYTE).withName("description"),
+            MemoryLayout.sequenceLayout(32, ValueLayout.JAVA_BYTE).withName("unit")
+    );
 
-   public static VarHeader fromByteBuffer(ByteBuffer buffer) {
-      if (VAR_HEADER_BLOCK_SIZE != buffer.remaining()) {
-         throw new IllegalArgumentException("buffer size for VarHeader should be " + VAR_HEADER_BLOCK_SIZE + " bytes");
-      }
-      var varInfo = VarInfo.fromByteBuffer(buffer.slice(0, VarInfo.VAR_INFO_SIZE).order(ByteOrder.LITTLE_ENDIAN));
+    public static VarHeader fromMemorySegment(MemorySegment segment) {
 
-      byte[] rawBuffer = buffer.array();
-      String name = new String(rawBuffer, VarInfo.VAR_INFO_SIZE, 32, StandardCharsets.US_ASCII).replaceAll("\\x00", "");
-      String description = new String(rawBuffer, 48, 64, StandardCharsets.US_ASCII).replaceAll("\\x00", "");
-      String unit = new String(rawBuffer, 112, 32, StandardCharsets.US_ASCII).replaceAll("\\x00", "");
-      return new VarHeader(name, description, unit, varInfo);
-   }
+        return new VarHeader(
+                segment.asSlice(VarInfo.getMemoryLayout().byteSize(), 32).getUtf8String(0),
+                segment.asSlice(VarInfo.getMemoryLayout().byteSize() + 32 ,64).getUtf8String(0),
+                segment.asSlice(VarInfo.getMemoryLayout().byteSize() + 32 +64,32).getUtf8String(0),
+                VarInfo.fromMemorySegment(segment.asSlice(0, VarInfo.getMemoryLayout().byteSize()))
+        );
+    }
+
+    public static MemoryLayout getMemoryLayout() {
+        return MEMORY_LAYOUT;
+    }
+
 }

@@ -15,13 +15,15 @@ dependencies {
 java {
     modularity.inferModulePath.set(true)
     toolchain {
-        vendor.set(JvmVendorSpec.ADOPTIUM)
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
 tasks {
     test {
         useJUnitPlatform()
+    }
+    withType<JavaCompile>() {
+        options.compilerArgs.addAll(listOf("--enable-preview"))
     }
 }

@@ -14,7 +14,7 @@ dependencies {
 val appMainClassName = "dev.vultureweb.iracing.telemetry.app.Main"
 val appModuleName = "dev.vultureweb.iracing.telemetry.app"
 val appName = "iracing-parser"
-val usedJDK = JavaVersion.VERSION_20.majorVersion
+val usedJDK = JavaVersion.VERSION_21.majorVersion
 
 val compiler = javaToolchains.compilerFor {
     languageVersion.set(JavaLanguageVersion.of(usedJDK))
@@ -23,7 +23,6 @@ val compiler = javaToolchains.compilerFor {
 java {
     modularity.inferModulePath.set(true)
     toolchain {
-        vendor.set(JvmVendorSpec.ADOPTIUM)
         languageVersion.set(JavaLanguageVersion.of(usedJDK))
     }
 }
@@ -31,11 +30,16 @@ java {
 application {
     mainClass.set(appMainClassName)
     mainModule.set(appModuleName)
+    applicationDefaultJvmArgs = listOf("--enable-preview");
 }
 
 tasks {
     test {
         useJUnitPlatform()
+    }
+
+    withType<JavaCompile>() {
+        options.compilerArgs.addAll(listOf("--enable-preview"))
     }
 
     task<Copy>("copyDependencies") {
@@ -48,10 +52,11 @@ tasks {
         val jdkHome = compiler.get().metadata.installationPath.asFile.absolutePath
         commandLine("${jdkHome}/bin/jpackage")
         args(listOf(
-            "-n", appName,
-            "-p", "$buildDir/modules"+File.pathSeparator+"$buildDir/libs",
-            "-d", "$buildDir/installer",
-            "-m", "${appModuleName}/${appMainClassName}"))
+                "-n", appName,
+                "--java-options", "--enable-preview",
+                "-p", "$buildDir/modules" + File.pathSeparator + "$buildDir/libs",
+                "-d", "$buildDir/installer",
+                "-m", "${appModuleName}/${appMainClassName}"))
     }
 }
 

@@ -1,59 +1,59 @@
 package dev.vultureweb.iracing.telemetry.api;
 
-import dev.vultureweb.iracing.sessioninfo.reader.SessionInfoReader;
+
 import dev.vultureweb.iracing.telemetry.api.model.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.lang.foreign.Arena;
+import java.nio.channels.FileChannel;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 
 public class TelemetryApi {
 
-   private static final System.Logger LOG = System.getLogger(TelemetryApi.class.getName());
+    private static final System.Logger LOG = System.getLogger(TelemetryApi.class.getName());
 
-   private final Map<UUID,Telemetry> telemetryCache = new HashMap<>();
+    private final Map<UUID, Telemetry> telemetryCache = new HashMap<>();
 
-   public UUID loadRTelemetry(final InputStream dataStream) {
+    public UUID loadTelemetry(final FileChannel reader) {
+        try (var arena = Arena.ofConfined()) {
+            var mappedFile = reader.map(FileChannel.MapMode.READ_ONLY, 0, reader.size(), arena);
+            var metaInfo = MetaInfo.fromMemorySegment(mappedFile.asSlice(0, MetaInfo.META_INFO_BLOCK_SIZE));
 
-      try (dataStream) {
-         assert (dataStream != null);
+            VarHeaderInfo varHeaderInfo = metaInfo.varHeaderInfo();
+            // Read var headers you need the slice that represents the var headers
+            // it starts after the meta info block and ends at the offset of the var headers
+            //var  varHeaderSlice = mappedFile.asSlice(MetaInfo.META_INFO_BLOCK_SIZE, varHeaderLayoutSize * numberOfVars);
+//            Map<String,VarHeader> varHeaders = new HashMap<>();
+//            for (int i = 0; i < varHeaderInfo.numberOfVars(); i++) {
+//                VarHeader varHeader = VarHeader.fromByteBuffer(ByteBuffer.wrap(dataStream.readNBytes(VarHeader.VAR_HEADER_BLOCK_SIZE))
+//                        .order(ByteOrder.LITTLE_ENDIAN));
+//                varHeaders.put(varHeader.name(),varHeader);
+//            }
 
-         MetaInfo metaInfo = MetaInfo.fromByteBuffer(ByteBuffer.wrap(dataStream.readNBytes(MetaInfo.META_INFO_BLOCK_SIZE)));
+            //Read session info starts after the var headers and ends at the offset of the buffer info
+            //offset is meta info block size + var header layout size * number of vars
+//            SessionInfo sessionInfo = metaInfo.sessionInfo();
+//            byte[] si = dataStream.readNBytes(sessionInfo.length());
+//
+//            String sessionYaml = new String(si, StandardCharsets.US_ASCII);
+//            var sessionInfoJson = SessionInfoReader.readSessionInfo(sessionYaml);
+            //Read buffer info starts after the session info and ends at the end of the file
+//            BufferInfo bufferInfo = metaInfo.bufferInfo();
+//
+//            ByteBuffer data = ByteBuffer.wrap(dataStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
+            UUID uuid = UUID.randomUUID();
+            //telemetryCache.put(uuid,new Telemetry(sessionInfoJson, varHeaders, bufferInfo, data));
+            return uuid;
+        } catch (IOException exception) {
+            LOG.log(System.Logger.Level.ERROR, "Error reading telemetry data", exception);
+            return null;
+        }
+    }
 
-         VarHeaderInfo varHeaderInfo = metaInfo.varHeaderInfo();
-         Map<String,VarHeader> varHeaders = new HashMap<>();
-         for (int i = 0; i < varHeaderInfo.numberOfVars(); i++) {
-            VarHeader varHeader = VarHeader.fromByteBuffer(ByteBuffer.wrap(dataStream.readNBytes(VarHeader.VAR_HEADER_BLOCK_SIZE))
-                  .order(ByteOrder.LITTLE_ENDIAN));
-            varHeaders.put(varHeader.name(),varHeader);
-         }
-
-         SessionInfo sessionInfo = metaInfo.sessionInfo();
-         byte[] si = dataStream.readNBytes(sessionInfo.length());
-
-         String sessionYaml = new String(si, StandardCharsets.US_ASCII);
-         var sessionInfoJson = SessionInfoReader.readSessionInfo(sessionYaml);
-         BufferInfo bufferInfo = metaInfo.bufferInfo();
-
-         ByteBuffer data = ByteBuffer.wrap(dataStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
-         UUID uuid = UUID.randomUUID();
-         telemetryCache.put(uuid,new Telemetry(sessionInfoJson, varHeaders, bufferInfo, data));
-         return uuid;
-      } catch (IOException exception) {
-         LOG.log(System.Logger.Level.ERROR, "Error reading telemetry data", exception);
-         throw new RuntimeException(exception);
-      }
-   }
-
-   public List<String> getVarNames(UUID telemetryUUID) {
-      Telemetry telemetry = telemetryCache.get(telemetryUUID);
-      return new ArrayList<>(telemetry.varHeaders().keySet());
-   }
-
-   public String getSessionInfo() {
-      return "TODO";
-   }
+    public String getSessionInfo() {
+        return "TODO";
+    }
 }

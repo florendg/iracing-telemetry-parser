@@ -11,3 +11,7 @@ rootProject.name = "iracing-telemetry-parser"
 include("session-info-reader", "telemetry-api", "telemetry-store", "app")
 
 val usedJDK: String = JavaVersion.VERSION_21.majorVersion
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version ("0.7.0")
+}

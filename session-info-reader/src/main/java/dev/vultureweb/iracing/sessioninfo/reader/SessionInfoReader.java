@@ -6,7 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class SessionInfoReader {
 
-   public static JsonNode readSessionInfo(final String sessionInfoYaml) {
+   public static SessionInfo readSessionInfo(final String sessionInfoYaml) {
       try {
          var mapper = new ObjectMapper(new YAMLFactory());
          mapper.findAndRegisterModules();
@@ -15,12 +15,9 @@ public class SessionInfoReader {
          var sessionInfo = fullTree.get("SessionInfo");
          var carSetup = fullTree.get("CarSetup");
          var driverInfo = fullTree.get("DriverInfo");
-         var info = new Info(weekendInfo, sessionInfo, carSetup, driverInfo);
-         return mapper.valueToTree(info);
+         return new SessionInfo(weekendInfo, sessionInfo, carSetup, driverInfo);
       } catch (Exception e) {
          throw new RuntimeException(e);
       }
    }
-
-   public record Info(JsonNode weekendInfo, JsonNode sessionInfo, JsonNode carSetup, JsonNode driverInfo){}
 }

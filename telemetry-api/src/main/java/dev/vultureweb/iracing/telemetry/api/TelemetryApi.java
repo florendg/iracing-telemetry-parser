@@ -1,6 +1,7 @@
 package dev.vultureweb.iracing.telemetry.api;
 
 
+import dev.vultureweb.iracing.sessioninfo.reader.SessionInfoReader;
 import dev.vultureweb.iracing.telemetry.api.model.*;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -32,11 +34,11 @@ public class TelemetryApi {
 
             //Read session info starts after the var headers and ends at the offset of the buffer info
             //offset is meta info block size + var header layout size * number of vars
-//            SessionInfo sessionInfo = metaInfo.sessionInfo();
-//            byte[] si = dataStream.readNBytes(sessionInfo.length());
-//
-//            String sessionYaml = new String(si, StandardCharsets.US_ASCII);
-//            var sessionInfoJson = SessionInfoReader.readSessionInfo(sessionYaml);
+            SessionInfo sessionInfo = metaInfo.sessionInfo();
+            byte[] si = mappedFile.asSlice(sessionInfo.offset(), sessionInfo.length()).toArray(ValueLayout.JAVA_BYTE);
+
+            String sessionYaml = new String(si, StandardCharsets.US_ASCII);
+            var sessionInfoJson = SessionInfoReader.readSessionInfo(sessionYaml);
             //Read buffer info starts after the session info and ends at the end of the file
 //            BufferInfo bufferInfo = metaInfo.bufferInfo();
 //

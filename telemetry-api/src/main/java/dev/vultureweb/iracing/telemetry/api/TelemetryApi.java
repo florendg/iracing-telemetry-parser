@@ -1,6 +1,5 @@
 package dev.vultureweb.iracing.telemetry.api;
 
-
 import dev.vultureweb.iracing.sessioninfo.reader.SessionInfoReader;
 import dev.vultureweb.iracing.telemetry.api.model.*;
 
@@ -8,11 +7,9 @@ import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
 
 public class TelemetryApi {
 
@@ -25,32 +22,34 @@ public class TelemetryApi {
             var mappedFile = reader.map(FileChannel.MapMode.READ_ONLY, 0, reader.size(), arena);
             var metaInfo = MetaInfo.fromMemorySegment(mappedFile.asSlice(0, MetaInfo.META_INFO_BLOCK_SIZE));
 
-            VarHeaderInfo varHeaderInfo = metaInfo.varHeaderInfo();
+            var varHeaderInfo = metaInfo.varHeaderInfo();
             // Read var headers you need the slice that represents the var headers
             // it starts after the meta info block and ends at the offset of the var headers
             var size = varHeaderInfo.numberOfVars() * VarHeader.getMemoryLayout().byteSize();
             List<VarHeader> varHeaders = parseVarHeaders(mappedFile.asSlice(varHeaderInfo.offset(), size), varHeaderInfo);
-//
 
             //Read session info starts after the var headers and ends at the offset of the buffer info
             //offset is meta info block size + var header layout size * number of vars
-            SessionInfo sessionInfo = metaInfo.sessionInfo();
-            byte[] si = mappedFile.asSlice(sessionInfo.offset(), sessionInfo.length()).toArray(ValueLayout.JAVA_BYTE);
+            var sessionMetaInfo = metaInfo.sessionMetaInfo();
+            byte[] si = mappedFile.asSlice(sessionMetaInfo.offset(), sessionMetaInfo.length()).toArray(ValueLayout.JAVA_BYTE);
 
             String sessionYaml = new String(si, StandardCharsets.US_ASCII);
-            var sessionInfoJson = SessionInfoReader.readSessionInfo(sessionYaml);
+            var sessionInfo = SessionInfoReader.readSessionInfo(sessionYaml);
             //Read buffer info starts after the session info and ends at the end of the file
-//            BufferInfo bufferInfo = metaInfo.bufferInfo();
-//
-//            ByteBuffer data = ByteBuffer.wrap(dataStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
+            BufferInfo bufferInfo = metaInfo.bufferInfo();
+            var data = mappedFile.asSlice(bufferInfo.offset(), bufferInfo.length()).toArray(ValueLayout.JAVA_BYTE);
             UUID uuid = UUID.randomUUID();
             LOG.log(System.Logger.Level.INFO, "Loaded telemetry data with UUID: {0}", metaInfo);
-            //telemetryCache.put(uuid,new Telemetry(sessionInfoJson, varHeaders, bufferInfo, data));
+            telemetryCache.put(uuid,new Telemetry(sessionInfo, varHeaders, bufferInfo, data));
             return uuid;
         } catch (IOException exception) {
             LOG.log(System.Logger.Level.ERROR, "Error reading telemetry data", exception);
             return null;
         }
+    }
+
+    public Telemetry getTelemetry(UUID uuid) {
+        return telemetryCache.get(uuid);
     }
 
     private List<VarHeader> parseVarHeaders(MemorySegment segment, VarHeaderInfo varHeaderInfo) {

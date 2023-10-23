@@ -1,11 +1,10 @@
 package dev.vultureweb.iracing.telemetry.api.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import dev.vultureweb.iracing.sessioninfo.reader.SessionInfo;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
+import java.util.List;
 
-public record Telemetry(JsonNode sessionInfo, Map<String,VarHeader> varHeaders, BufferInfo bufferInfo, ByteBuffer data) {
+public record Telemetry(SessionInfo sessionMetaInfo, List<VarHeader> varHeaders, BufferInfo bufferInfo, byte[] data) {
 
 
 }

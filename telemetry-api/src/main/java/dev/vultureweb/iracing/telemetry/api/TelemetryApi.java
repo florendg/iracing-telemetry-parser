@@ -39,7 +39,6 @@ public class TelemetryApi {
             BufferInfo bufferInfo = metaInfo.bufferInfo();
             var data = mappedFile.asSlice(bufferInfo.offset(), bufferInfo.length()).toArray(ValueLayout.JAVA_BYTE);
             UUID uuid = UUID.randomUUID();
-            LOG.log(System.Logger.Level.INFO, "Loaded telemetry data with UUID: {0}", metaInfo);
             telemetryCache.put(uuid,new Telemetry(sessionInfo, varHeaders, bufferInfo, data));
             return uuid;
         } catch (IOException exception) {
@@ -57,7 +56,6 @@ public class TelemetryApi {
         for (int i = 0; i < varHeaderInfo.numberOfVars(); i++) {
             var varHeader = VarHeader.fromMemorySegment(segment.asSlice(i * VarHeader.getMemoryLayout().byteSize(), VarHeader.getMemoryLayout().byteSize()));
             varHeaders.add(varHeader);
-            LOG.log(System.Logger.Level.INFO, "Loaded var header {0}: {1}",i, varHeader);
         }
         return varHeaders;
     }

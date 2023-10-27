@@ -22,6 +22,7 @@ java {
 tasks {
     test {
         useJUnitPlatform()
+        jvmArgs = listOf("--enable-preview")
     }
     withType<JavaCompile>() {
         options.compilerArgs.addAll(listOf("--enable-preview"))

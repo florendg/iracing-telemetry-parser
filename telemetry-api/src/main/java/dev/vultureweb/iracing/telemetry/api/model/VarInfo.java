@@ -5,7 +5,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.ByteOrder;
 
-public record VarInfo(int type, int offset, int count, boolean countAsTime) {
+public record VarInfo(Type type, int offset, int count, boolean countAsTime) {
 
     private static final MemoryLayout MEMORY_LAYOUT = MemoryLayout.structLayout(
             ValueLayout.JAVA_INT.withName("type"),
@@ -15,7 +15,7 @@ public record VarInfo(int type, int offset, int count, boolean countAsTime) {
     );
 
     public static VarInfo fromMemorySegment(MemorySegment memorySegment) {
-        var type = memorySegment.get(ValueLayout.JAVA_INT, 0);
+        var type = Type.fromCode(memorySegment.get(ValueLayout.JAVA_INT, 0));
         var offset = memorySegment.get(ValueLayout.JAVA_INT.withOrder(ByteOrder.LITTLE_ENDIAN), ValueLayout.JAVA_INT.byteSize());
         var count = memorySegment.get(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT.byteSize() * 2);
         boolean countAsTime = memorySegment.get(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT.byteSize() * 3) == 1;
